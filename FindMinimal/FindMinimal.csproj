@@ -43,7 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayGenerator.cs" />
+    <Compile Include="AsyncArray.cs" />
+    <Compile Include="AsyncResult.cs" />
     <Compile Include="Benchmark.cs" />
+    <Compile Include="FindMinimalDelegateData.cs" />
     <Compile Include="MinFunctionsAggregator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
