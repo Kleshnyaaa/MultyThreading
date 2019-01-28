@@ -7,6 +7,8 @@ namespace FindMinimal
 {
     public static class MinFunctionsAggregator
     {
+        private static object Locker = new object();
+
         public static int FindMinimalInOneThread(int[] data)
         {
             var min = data[0];
@@ -97,7 +99,11 @@ namespace FindMinimal
                 }
             }
 
-            delegateData.ResultsStorage.Add(min);
+            lock (Locker)
+            {
+                delegateData.ResultsStorage.Add(min); 
+            }
+
             delegateData.CountdownEvent.Signal();
         }
 

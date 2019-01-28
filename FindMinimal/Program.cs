@@ -35,8 +35,8 @@ namespace FindMinimal
             #endregion
 
             #region Find optimal size for running search on multi threads
-            //Console.WriteLine("\nStart to calculating an optimal array size for multi threads...");
-            //FindOptimalArraySizeForMultiThreading(); 
+            Console.WriteLine("\nStart to calculating an optimal array size for multi threads...");
+            FindOptimalArraySizeForMultiThreading(); 
             #endregion
 
             Console.WriteLine("Done. Press any key.");
@@ -62,6 +62,9 @@ namespace FindMinimal
 
                 multiThreadsPerformance = Benchmark.Profile($"Multi thread search. Array size {processingItemsNumber}.",
                     BenchmarkIterations, () => MinFunctionsAggregator.FindMinimalByMultiThreading(data));
+
+                Benchmark.Profile($"ThreadPool search. Array size {processingItemsNumber}.",
+                    BenchmarkIterations, () => MinFunctionsAggregator.FindMinimalByThreadPool(data));
 
                 if (oneThreadPerformance < multiThreadsPerformance)
                 {
