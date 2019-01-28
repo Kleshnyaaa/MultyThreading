@@ -29,11 +29,14 @@ namespace FindMinimal
 
             Benchmark.Profile($"Find minimal in Multi Threads. Number of items: {ArraySize}.", BenchmarkIterations,
                 () => MinFunctionsAggregator.FindMinimalByMultiThreading(data));
+
+            Benchmark.Profile($"Find minimal by ThreadPool. Number of items: {ArraySize}.", BenchmarkIterations,
+                () => MinFunctionsAggregator.FindMinimalByThreadPool(data));
             #endregion
 
             #region Find optimal size for running search on multi threads
-            Console.WriteLine("\nStart to calculating an optimal array size for multi threads...");
-            FindOptimalArraySizeForMultiThreading(); 
+            //Console.WriteLine("\nStart to calculating an optimal array size for multi threads...");
+            //FindOptimalArraySizeForMultiThreading(); 
             #endregion
 
             Console.WriteLine("Done. Press any key.");

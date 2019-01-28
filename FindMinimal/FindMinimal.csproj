@@ -46,6 +46,7 @@
     <Compile Include="AsyncArray.cs" />
     <Compile Include="AsyncResult.cs" />
     <Compile Include="Benchmark.cs" />
+    <Compile Include="ThreadPoolDelegateData.cs" />
     <Compile Include="FindMinimalDelegateData.cs" />
     <Compile Include="MinFunctionsAggregator.cs" />
     <Compile Include="Program.cs" />

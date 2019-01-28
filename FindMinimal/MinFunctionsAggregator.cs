@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace FindMinimal
@@ -31,30 +33,15 @@ namespace FindMinimal
 
             for (int i = 0; i < coresNumber; i++)
             {
-                FindMinimalDelegateData delegateData;
-
-                if (i != coresNumber - 1)
+                var endIndex = (i != coresNumber - 1) ? (i + 1) * itemsPerCore : i * itemsPerCore + itemsForLastCore;
+                var delegateData = new FindMinimalDelegateData
                 {
-                    delegateData = new FindMinimalDelegateData()
-                    {
-                        SourceArray = data,
-                        StartIndex = i * itemsPerCore,
-                        EndIndex = (i + 1) * itemsPerCore,
-                        ResultsStorage = threadsCalculationsResult,
-                        ThreadIndex = i
-                    };
-                }
-                else
-                {
-                    delegateData = new FindMinimalDelegateData()
-                    {
-                        SourceArray = data,
-                        StartIndex = i * itemsPerCore,
-                        EndIndex = i * itemsPerCore + itemsForLastCore,
-                        ResultsStorage = threadsCalculationsResult,
-                        ThreadIndex = i
-                    };
-                }
+                    SourceArray = data,
+                    StartIndex = i * itemsPerCore,
+                    EndIndex = endIndex,
+                    ResultsStorage = threadsCalculationsResult,
+                    ThreadIndex = i
+                };
 
                 threads[i] = new Thread(FindMinimalInPartOfArray);
                 threads[i].Start(delegateData);
@@ -66,6 +53,52 @@ namespace FindMinimal
             }
 
             return FindMinimalInOneThread(threadsCalculationsResult);
+        }
+
+        public static int FindMinimalByThreadPool(int[] data)
+        {
+            var coresNumber = Environment.ProcessorCount;
+            var itemsPerCore = data.Length / coresNumber;
+            var itemsForLastCore = itemsPerCore + data.Length % coresNumber;
+
+            var countdown = new CountdownEvent(coresNumber);
+            var results = new List<int>();
+
+            for (int i = 0; i < coresNumber; i++)
+            {
+                var endIndex = (i != coresNumber - 1) ? (i + 1) * itemsPerCore : i * itemsPerCore + itemsForLastCore;
+                var delegateData = new ThreadPoolDelegateData
+                {
+                    SourceArray = data,
+                    StartIndex = i * itemsPerCore,
+                    EndIndex = endIndex,
+                    ResultsStorage = results,
+                    CountdownEvent = countdown
+                };
+
+                ThreadPool.QueueUserWorkItem(FindMinimalInPartOfArray_ThreadPool, delegateData);
+            }
+
+            countdown.Wait();
+
+            return results.Min();
+        }
+
+        private static void FindMinimalInPartOfArray_ThreadPool(object delegateDataObject)
+        {
+            var delegateData = (ThreadPoolDelegateData) delegateDataObject;
+            var min = delegateData.SourceArray[delegateData.StartIndex];
+
+            for (int i = delegateData.StartIndex; i < delegateData.EndIndex; i++)
+            {
+                if (min > delegateData.SourceArray[i])
+                {
+                    min = delegateData.SourceArray[i];
+                }
+            }
+
+            delegateData.ResultsStorage.Add(min);
+            delegateData.CountdownEvent.Signal();
         }
 
         private static void FindMinimalInPartOfArray(object delegateDataObject)
